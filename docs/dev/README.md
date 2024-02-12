@@ -12,6 +12,8 @@ Developer focused documentation should be written in this `docs/dev/` directory.
 
 Only Committers on the PASS Eclipse project are able to make changes to the code repositories, however contributions from non-committers are welcome and encouraged. These contributions should be made in the form of a Pull Request (PR) on the appropriate GitHub repository.
 
+New Developer guidelines PR test
+
 ### Contribution Guidelines
 
 * All code changes should be submitted in the form of a Pull Request (PR).
