@@ -1,41 +1,45 @@
+# ui-api-usage
+
 A UI centric view on PASS APIs as of PASS v0.1.0. These are a list of services consumed by the UI along with brief descriptions of each. These descriptions do not include full configurations of the services, but includes only those configurations needed for the UI to work, typically just the URL endpoint for the services. This documentation is meant to describe the APIs as they were for our initial versions of PASS to inform ongoing development and not necessarily meant to be carried forward.
 
-- [Metadata Schema Service](#metadata-schema-service)
-- [DOI Service](#doi-service)
-- [User Service](#user-service)
-- [Download Service](#download-service)
-	- [Lookup](#lookup)
-	- [Download](#download)
-- [Policy Service](#policy-service)
-	- [Policies](#policies)
-	- [Repositories](#repositories)
-- [PASS Data Entities](#pass-data-entities)
-	- [Create](#create)
-	- [Read](#read)
-		- [Single](#single)
-		- [Multiple](#multiple)
-	- [Update](#update)
-	- [Delete](#delete)
-- [Misc operations](#misc-operations)
-	- [Setup Fedora](#setup-fedora)
-	- [Clear](#clear)
+* [Metadata Schema Service](ui-api-usage.md#metadata-schema-service)
+* [DOI Service](ui-api-usage.md#doi-service)
+* [User Service](ui-api-usage.md#user-service)
+* [Download Service](ui-api-usage.md#download-service)
+  * [Lookup](ui-api-usage.md#lookup)
+  * [Download](ui-api-usage.md#download)
+* [Policy Service](ui-api-usage.md#policy-service)
+  * [Policies](ui-api-usage.md#policies)
+  * [Repositories](ui-api-usage.md#repositories)
+* [PASS Data Entities](ui-api-usage.md#pass-data-entities)
+  * [Create](ui-api-usage.md#create)
+  * [Read](ui-api-usage.md#read)
+    * [Single](ui-api-usage.md#single)
+    * [Multiple](ui-api-usage.md#multiple)
+  * [Update](ui-api-usage.md#update)
+  * [Delete](ui-api-usage.md#delete)
+* [Misc operations](ui-api-usage.md#misc-operations)
+  * [Setup Fedora](ui-api-usage.md#setup-fedora)
+  * [Clear](ui-api-usage.md#clear)
 
-# Metadata Schema Service
+## Metadata Schema Service
+
 https://github.com/eclipse-pass/pass-metadata-schemas
 
 Retrieve an ordered list of relevant [JSON schemas](https://json-schema.org/) describing metadata given a list of PASS Repositories.
 
-|  |  |
-| --- | --- |
-| URL | `/schemaservice` |
-| config | `SCHEMA_SERVICE_URL` |
-| Method | POST |
-| Headers | "Content-Type: application/json; charset=utf-8" <strong>OR</strong><br> "Content-Type: text/plain" |
-| Parameters | `?merge=true` (optional) |
-| body | Array of PASS Repository object IDs (for type json) <strong>OR</strong><br> List of PASS Repository object IDs, separated by newline characters (plain text) |
-| Response | List of JSON schemas |
+|            |                                                                                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| URL        | `/schemaservice`                                                                                                                                                   |
+| config     | `SCHEMA_SERVICE_URL`                                                                                                                                               |
+| Method     | POST                                                                                                                                                               |
+| Headers    | <p>"Content-Type: application/json; charset=utf-8" <strong>OR</strong><br>"Content-Type: text/plain"</p>                                                           |
+| Parameters | `?merge=true` (optional)                                                                                                                                           |
+| body       | <p>Array of PASS Repository object IDs (for type json) <strong>OR</strong><br>List of PASS Repository object IDs, separated by newline characters (plain text)</p> |
+| Response   | List of JSON schemas                                                                                                                                               |
 
 Sample request:
+
 ```
 POST
 	Content-Type: application/json; charset=utf-8
@@ -48,7 +52,8 @@ Body:
 ```
 
 Sample response:
-``` JSON
+
+```JSON
 [
 	{
 	  "title": "Common schema",
@@ -101,70 +106,83 @@ If the `merge` parameter is set with any value, the service will merge all relev
 
 **Errors**
 
-| Code | Description |
---- | ---
-`409` | Service was unable to merge the schemas together. This will only occur if the `merge` parameter is set. If this error occurs, the client should issue a new request for the unmerged schemas
+| Code  | Description                                                                                                                                                                                  |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `409` | Service was unable to merge the schemas together. This will only occur if the `merge` parameter is set. If this error occurs, the client should issue a new request for the unmerged schemas |
 
----
+***
 
-# DOI Service
+## DOI Service
 
 https://github.com/eclipse-pass/pass-doi-service
 
-Interacts with Crossref to get data about a given DOI. [See example DOI data](https://gist.github.com/jabrah/c268c6b027bd2646595e266f872c883c)
-Get an ID to a PASS Journal object represented by the DOI and the raw Crossref data for the given DOI
+Interacts with Crossref to get data about a given DOI. [See example DOI data](https://gist.github.com/jabrah/c268c6b027bd2646595e266f872c883c) Get an ID to a PASS Journal object represented by the DOI and the raw Crossref data for the given DOI
 
 The UI does some data transformation to trim the Crossref data and light processing to fit it into our PASS Publication model before persisting the Publication.
 
-|  |  |
-| --- | --- |
-| URL | `/doiservice/journal` |
-| Config | `DOI_SERVICE_URL` |
-| Method | `GET` |
-| Parameters | `?doi` (string) a DOI |
-| Headers | `Accept: "application/json; charset=utf-8" |
-| Body |  |
-| Response | <pre>{<br>	"crossref": {<br>		"message": { ... }, // Raw data from Crossref[^xref]<br>	},<br>	"journal-id": ""<br>}</pre> |
+|            |                                                                                                                                                                      |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| URL        | `/doiservice/journal`                                                                                                                                                |
+| Config     | `DOI_SERVICE_URL`                                                                                                                                                    |
+| Method     | `GET`                                                                                                                                                                |
+| Parameters | `?doi` (string) a DOI                                                                                                                                                |
+| Headers    | \`Accept: "application/json; charset=utf-8"                                                                                                                          |
+| Body       |                                                                                                                                                                      |
+| Response   | <pre><code>{
+	"crossref": {
+		"message": { ... }, // Raw data from <a data-footnote-ref href="#user-content-fn-1">Crossref</a>
+	},
+	"journal-id": ""
+}
+</code></pre> |
 
 In the UI, we ultimately process the Crossref data into a Publication model object and add anything else we can into the Submission's metadata blob to fit the submission's known metadata schema. Should these transformations be done server side, or is there a reason that it needs to be done client side (client review & approval?) - see `doi#doiToMetadata()`
 
-[^xref]: [Crossref data format](https://github.com/CrossRef/rest-api-doc/blob/master/api_format.md )
+***
 
----
-
-# User Service
+## User Service
 
 Get the currently logged in User.
 
-|  |  |
-| --- | --- |
-| URL | `/pass-user-service/whoami` |
-| Config | `USER_SERVICE_URL` |
-| Method | `GET` |
-| Parameters | `userToken`: auth token |
-| Headers | `Accept: "application/json; charset=utf-8"` |
-| Body |  |
-| Response | A PASS User object |
+|            |                                             |
+| ---------- | ------------------------------------------- |
+| URL        | `/pass-user-service/whoami`                 |
+| Config     | `USER_SERVICE_URL`                          |
+| Method     | `GET`                                       |
+| Parameters | `userToken`: auth token                     |
+| Headers    | `Accept: "application/json; charset=utf-8"` |
+| Body       |                                             |
+| Response   | A PASS User object                          |
 
-# Download Service
+## Download Service
 
 https://github.com/eclipse-pass/pass-download-service
 
 Allows client lookups and downloads of previously uploaded files associated with Submissions.
 
-## Lookup 
+### Lookup
 
 Get a list of open access copies for the given DOI
 
-|  |  |
-| --- | --- |
-| URL | `/downloadservice/lookup` |
-| Config | `MANUSCRIPT_SERVICE_LOOKUP_URL` |
-| Method | `GET` |
-| Parameters | `userToken`: auth token |
-| Headers | `Accept: "application/json; charset=utf-8"` |
-| Body |  |
-| Response | Array: <pre>[<br>  {<br>    "url": "",<br>    "name": "",<br>    "type": "",<br>    "source": "",<br>    "repositoryLabel": ""<br>  },<br>  ...<br>]</pre> |
+|            |                                                                                                                                                     |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| URL        | `/downloadservice/lookup`                                                                                                                           |
+| Config     | `MANUSCRIPT_SERVICE_LOOKUP_URL`                                                                                                                     |
+| Method     | `GET`                                                                                                                                               |
+| Parameters | `userToken`: auth token                                                                                                                             |
+| Headers    | `Accept: "application/json; charset=utf-8"`                                                                                                         |
+| Body       |                                                                                                                                                     |
+| Response   | <p>Array:</p><pre><code>[
+  {
+    "url": "",
+    "name": "",
+    "type": "",
+    "source": "",
+    "repositoryLabel": ""
+  },
+  ...
+]
+</code></pre> |
 
 * `url`: URL where the manuscript can be retrieved
 * `name` file name
@@ -172,25 +190,25 @@ Get a list of open access copies for the given DOI
 * `source`: Source of the file (e.g. "Unpaywall")
 * `repositoryLabel`: Human readable label of the repository where the manuscript is stored
 
-## Download
+### Download
 
-|  |  |
-| --- | --- |
-| URL | `/downloadservice/download` |
-| Config | `MANUSCRIPT_SERVICE_DOWNLOAD_URL` |
-| Method | `GET` |
-| Parameters | <p>`doi` (string) publication DOI</p><p>`url` download URL of the file</p> |
-| Headers |  |
-| Body |  |
-| Response | The file, downloaded via the backend download service |
+|            |                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------ |
+| URL        | `/downloadservice/download`                                                                      |
+| Config     | `MANUSCRIPT_SERVICE_DOWNLOAD_URL`                                                                |
+| Method     | `GET`                                                                                            |
+| Parameters | <p><code>doi</code> (string) publication DOI</p><p><code>url</code> download URL of the file</p> |
+| Headers    |                                                                                                  |
+| Body       |                                                                                                  |
+| Response   | The file, downloaded via the backend download service                                            |
 
-Response 
+Response
 
 Not sure whether or not this is used by the UI
 
----
+***
 
-# Policy Service
+## Policy Service
 
 https://github.com/eclipse-pass/pass-policy-service
 
@@ -198,27 +216,29 @@ https://github.com/eclipse-pass/pass-policy-service
 
 Config: `POLICY_SERVICE_URL` base URL for the policy service
 
-## Policies
+### Policies
 
 Get a list of policies that apply to a submission, given its PASS ID (URI). Typically only used with in-progress submissions.
 
-|  |  |
-| --- | --- |
-| URL | `/policy-service/policies` |
-| Config | `POLICY_SERVICE_POLICY_ENDPOINT` |
-| Method | `GET` or `POST` |
-| Parameters | `submission` a submission ID |
-| Headers | `Content-Type: application/x-www-form-urlencoded` |
-| Body | `submission=submission_id` if a POST |
-| Response | An array of PASS Policy object IDs |
+|            |                                                   |
+| ---------- | ------------------------------------------------- |
+| URL        | `/policy-service/policies`                        |
+| Config     | `POLICY_SERVICE_POLICY_ENDPOINT`                  |
+| Method     | `GET` or `POST`                                   |
+| Parameters | `submission` a submission ID                      |
+| Headers    | `Content-Type: application/x-www-form-urlencoded` |
+| Body       | `submission=submission_id` if a POST              |
+| Response   | An array of PASS Policy object IDs                |
 
 Sample request:
+
 ```
 GET /policy-service/policies?submission=<submission_id>
 ```
 
 Sample response:
-``` JSON
+
+```JSON
 [
  {
    "id": "http://pass.local:8080/fcrepo/rest/policies/2d/...",
@@ -233,25 +253,27 @@ Sample response:
 
 The `type` property identifies the source of the policy and will only take the values of `funder` or `institution`.
 
-## Repositories
+### Repositories
 
-|  |  |
-| --- | --- |
-| URL | `policy-service/repositories` |
-| Config | `POLICY_SERVICE_REPOSITORY_ENDPOINT` |
-| Method | `GET` or `POST` |
-| Parameters | `submission` submission ID |
-| Headers | `Content-Type: application/x-www-form-urlencoded` |
-| Body | `submission=submission_id` if a POST |
-| Response | JSON object containing required, optional, and choice repositories |
+|            |                                                                    |
+| ---------- | ------------------------------------------------------------------ |
+| URL        | `policy-service/repositories`                                      |
+| Config     | `POLICY_SERVICE_REPOSITORY_ENDPOINT`                               |
+| Method     | `GET` or `POST`                                                    |
+| Parameters | `submission` submission ID                                         |
+| Headers    | `Content-Type: application/x-www-form-urlencoded`                  |
+| Body       | `submission=submission_id` if a POST                               |
+| Response   | JSON object containing required, optional, and choice repositories |
 
 Sample request:
+
 ```
 GET /policy-service/repositories
 ```
 
 Sample response:
-``` JSON
+
+```JSON
 {
 	"required": [
 		{
@@ -289,129 +311,129 @@ Sample response:
 	]
 }
 ```
+
 * `selected` status denotes default choices, if the user is presented with options
 * `required` submissions MUST be depositied into these repositories
-* `one-of` array of arrays presenting choice-sets. The submission must be deposited into at least one from each choice-set. In this example, the submission must be deposited into repository (2 OR 3) AND (4 OR 5). 
+* `one-of` array of arrays presenting choice-sets. The submission must be deposited into at least one from each choice-set. In this example, the submission must be deposited into repository (2 OR 3) AND (4 OR 5).
 * `optional` the submission MAY be submitted to these repositories
 
----
+***
 
-# PASS Data Entities
+## PASS Data Entities
 
 All CRUD requests for PASS data entities route through the [`pass-ember-adapter`](https://github.com/eclipse-pass/pass-ember-adapter).
 
 Headers:
+
 * `Accept: application/ld+json; profile="http://www.w3.org/ns/json-ld#compacted"`
 * `Prefer: return=representation; omit="http://fedora.info/definitions/v4/repository#ServerManaged"`
 * `Authorization=<...>`
 
 All operations use these headers, unless otherwise specified.
 
-| Operation | Adapter Function | URL | Headers | Parameters
-| --- | --- |
-| 
+\| Operation | Adapter Function | URL | Headers | Parameters | --- | --- | |
 
-## Create
+### Create
 
-|  |  |
-| --- | --- |
-| Adapter function | `#createRecord` |
-| URL | `<fedora_base_url>/<container_name>` |
-| Config |  |
-| Method | `POST` |
-| Parameters |  |
-| Headers | +`Content-Type: application/ld+json; charset=utf-8` |
-| Body | JSON-LD serialized data |
-| Response | Fedora responds with the newly created entity ID in the `response.Location` header |
+|                  |                                                                                    |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| Adapter function | `#createRecord`                                                                    |
+| URL              | `<fedora_base_url>/<container_name>`                                               |
+| Config           |                                                                                    |
+| Method           | `POST`                                                                             |
+| Parameters       |                                                                                    |
+| Headers          | +`Content-Type: application/ld+json; charset=utf-8`                                |
+| Body             | JSON-LD serialized data                                                            |
+| Response         | Fedora responds with the newly created entity ID in the `response.Location` header |
 
-## Read
+### Read
 
-### Single
+#### Single
 
-|  |  |
-| --- | --- |
-| Adapter function | `#findRecord` |
-| URL | Entity ID |
-| Config |  |
-| Method | `GET` |
-| Parameters |  |
-| Headers |  |
-| Body |  |
-| Response | The entity, serialized as an Ember model object |
+|                  |                                                 |
+| ---------------- | ----------------------------------------------- |
+| Adapter function | `#findRecord`                                   |
+| URL              | Entity ID                                       |
+| Config           |                                                 |
+| Method           | `GET`                                           |
+| Parameters       |                                                 |
+| Headers          |                                                 |
+| Body             |                                                 |
+| Response         | The entity, serialized as an Ember model object |
 
-### Multiple
+#### Multiple
 
-|  |  |
-| --- | --- |
-| Adapter function | `#query` |
-| URL | `/pass/_search` |
-| Config | `FEDORA_ADAPTER_ES` |
-| Method | `POST` |
-| Parameters |  |
-| Headers | `Content-Type: application/json; charset=utf-8` |
-| Body | An Elasticsearch query in JSON format |
-| Response | List of matching entities |
+|                  |                                                 |
+| ---------------- | ----------------------------------------------- |
+| Adapter function | `#query`                                        |
+| URL              | `/pass/_search`                                 |
+| Config           | `FEDORA_ADAPTER_ES`                             |
+| Method           | `POST`                                          |
+| Parameters       |                                                 |
+| Headers          | `Content-Type: application/json; charset=utf-8` |
+| Body             | An Elasticsearch query in JSON format           |
+| Response         | List of matching entities                       |
 
-|  |  |
-| --- | --- |
-| Adapter function | `#findAll` |
-| URL | `/pass/_search` |
-| Config | `FEDORA_ADAPTER_ES` |
-| Method | `POST` |
-| Parameters |  |
-| Headers | `Content-Type: application/json; charset=utf-8` |
-| Body | An Elasticsearch query that will match all entities of a given model |
-| Response | List of entities |
+|                  |                                                                      |
+| ---------------- | -------------------------------------------------------------------- |
+| Adapter function | `#findAll`                                                           |
+| URL              | `/pass/_search`                                                      |
+| Config           | `FEDORA_ADAPTER_ES`                                                  |
+| Method           | `POST`                                                               |
+| Parameters       |                                                                      |
+| Headers          | `Content-Type: application/json; charset=utf-8`                      |
+| Body             | An Elasticsearch query that will match all entities of a given model |
+| Response         | List of entities                                                     |
 
-## Update
+### Update
 
-|  |  |
-| --- | --- |
-| Adapter function | `#updateRecord` |
-| URL | Entity ID |
-| Config |  |
-| Method | `PATCH` |
-| Parameters |  |
-| Headers | `Content-Type: application/merge-patch+json; charset=utf-8" |
-| Body | JSON-LD serialized entity |
-| Response |  |
+|                  |                                                              |
+| ---------------- | ------------------------------------------------------------ |
+| Adapter function | `#updateRecord`                                              |
+| URL              | Entity ID                                                    |
+| Config           |                                                              |
+| Method           | `PATCH`                                                      |
+| Parameters       |                                                              |
+| Headers          | \`Content-Type: application/merge-patch+json; charset=utf-8" |
+| Body             | JSON-LD serialized entity                                    |
+| Response         |                                                              |
 
-## Delete
+### Delete
 
 Will delete the entity then delete it's tombstone.
 
-|  |  |
-| --- | --- |
-| Adapter function | `#deleteRecord` |
-| URL | Entity ID AND (entity_ID/fcr:tombstone) |
-| Config |  |
-| Method | `DELETE` |
-| Parameters |  |
-| Headers |  |
-| Body |  |
-| Response |  |
+|                  |                                          |
+| ---------------- | ---------------------------------------- |
+| Adapter function | `#deleteRecord`                          |
+| URL              | Entity ID AND (entity\_ID/fcr:tombstone) |
+| Config           |                                          |
+| Method           | `DELETE`                                 |
+| Parameters       |                                          |
+| Headers          |                                          |
+| Body             |                                          |
+| Response         |                                          |
 
-# Misc operations
+## Misc operations
 
-## Setup Fedora
+### Setup Fedora
 
 `#setupFedora`
 
 Remnant of the original demo code, now only called in tests. Calls the Delete then Create functions for all known model types in order to create the fresh containers in Fedora.
 
-## Clear 
+### Clear
 
 Only used in testing for this adapter.
 
-|  |  |
-| --- | --- |
-| Adapter function | `#clearElasticsearch` |
-| URL | `<ES_url>/_doc/_delete_by_query?conflicts=proceed&refresh` |
-| Config |  |
-| Method | `POST` |
-| Parameters | Static/baked into URL |
-| Headers | Content-Type: application/json` |
-| Body | `{ query: { match_all: {} } }` |
-| Response |  |
+|                  |                                                            |
+| ---------------- | ---------------------------------------------------------- |
+| Adapter function | `#clearElasticsearch`                                      |
+| URL              | `<ES_url>/_doc/_delete_by_query?conflicts=proceed&refresh` |
+| Config           |                                                            |
+| Method           | `POST`                                                     |
+| Parameters       | Static/baked into URL                                      |
+| Headers          | Content-Type: application/json\`                           |
+| Body             | `{ query: { match_all: {} } }`                             |
+| Response         |                                                            |
 
-
+[^1]: [Crossref data format](https://github.com/CrossRef/rest-api-doc/blob/master/api\_format.md)

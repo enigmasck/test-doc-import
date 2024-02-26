@@ -1,7 +1,3 @@
----
-description: This is a test page description to see how GitBook commits/PR work
----
-
 # Developer Documentation
 
 Developer focused documentation should be written in this `docs/dev/` directory. Separate documentation pages can be added in this directory and referenced here. If a given component has many documentation pages, please add a directory for it within the [docs/dev/](./) directory.
@@ -11,8 +7,6 @@ Developer focused documentation should be written in this `docs/dev/` directory.
 ### Committers and Contributors
 
 Only Committers on the PASS Eclipse project are able to make changes to the code repositories, however contributions from non-committers are welcome and encouraged. These contributions should be made in the form of a Pull Request (PR) on the appropriate GitHub repository.
-
-New Developer guidelines PR test
 
 ### Contribution Guidelines
 
